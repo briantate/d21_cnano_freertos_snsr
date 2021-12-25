@@ -146,11 +146,17 @@ void APP_SENSOR_Tasks ( void )
 
         case APP_SENSOR_STATE_SERVICE_TASKS:
         {
+            printf("\033[K");
             printf("%d\r\n", ++measurementCount);
             bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &bmi160_accel, &bmi160_gyro, &bmi160dev);
+            printf("\033[K");
             printf("ax:%d\tay:%d\taz:%d\r\n", bmi160_accel.x, bmi160_accel.y, bmi160_accel.z);
+            printf("\033[K");
             printf("gx:%d\tgy:%d\tgz:%d\r\n", bmi160_gyro.x, bmi160_gyro.y, bmi160_gyro.z);
-            printf("\033[F\033[F\033[F"); //go up one line
+            printf("\033[F");
+            printf("\033[F");
+            printf("\033[F");
+            
             vTaskDelay(1000/portTICK_PERIOD_MS); //ToDo: synchronize a different way
 
             break;
