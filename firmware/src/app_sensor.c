@@ -129,7 +129,7 @@ void APP_SENSOR_Initialize ( void )
 
 void APP_SENSOR_Tasks ( void )
 {
-
+    static uint32_t measurementCount = 0;
     /* Check the application's current state. */
     switch ( app_sensorData.state )
     {
@@ -146,9 +146,11 @@ void APP_SENSOR_Tasks ( void )
 
         case APP_SENSOR_STATE_SERVICE_TASKS:
         {
+            printf("%d\r\n", ++measurementCount);
             bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &bmi160_accel, &bmi160_gyro, &bmi160dev);
             printf("ax:%d\tay:%d\taz:%d\r\n", bmi160_accel.x, bmi160_accel.y, bmi160_accel.z);
             printf("gx:%d\tgy:%d\tgz:%d\r\n", bmi160_gyro.x, bmi160_gyro.y, bmi160_gyro.z);
+            printf("\033[F\033[F\033[F"); //go up one line
             vTaskDelay(1000/portTICK_PERIOD_MS); //ToDo: synchronize a different way
 
             break;
@@ -190,24 +192,36 @@ static void init_bmi160(void)
         exit(0); //ToDo implement error codes?
     }
 
-    /* Select the Output data rate, range of accelerometer sensor */
-    bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_1600HZ;
-    bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_16G;
+//    /* Select the Output data rate, range of accelerometer sensor */
+//    bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_1600HZ;
+    bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_100HZ;
+//    bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_16G;
+    bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
     bmi160dev.accel_cfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
-
-    /* Select the power mode of accelerometer sensor */
+//
+//    /* Select the power mode of accelerometer sensor */
     bmi160dev.accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
-
-    /* Select the Output data rate, range of Gyroscope sensor */
-    bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+//
+//    /* Select the Output data rate, range of Gyroscope sensor */
+//    bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
+    bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_100HZ;
     bmi160dev.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
     bmi160dev.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
-
-    /* Select the power mode of Gyroscope sensor */
+//
+//    /* Select the power mode of Gyroscope sensor */
     bmi160dev.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
 
     /* Set the sensor configuration */
     rslt = bmi160_set_sens_conf(&bmi160dev);
+    if (rslt == BMI160_OK)
+    {
+        printf("BMI160 set config success !\r\n");
+    }
+    else
+    {
+        printf("BMI160 set config failure !\r\n");
+        exit(0); //ToDo implement error codes?
+    }
 }
 
 static void init_bmi160_sensor_driver_interface(void)
@@ -232,7 +246,7 @@ int8_t bmi160_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t l
         return BMI160_OK;
 }
 
-int8_t bmi160_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len) //ToDo: is this right? Why does a "write" function have "read_data"?
+int8_t bmi160_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
     static uint8_t sensorBuffer[SNSR_BUF_SIZE];
     
@@ -241,7 +255,7 @@ int8_t bmi160_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t 
     sensorBuffer[0] = reg_addr;
     memcpy(&sensorBuffer[1], data, len);
     
-    if (false == DRV_I2C_WriteTransfer(sensorHandle, dev_addr, data, (size_t)len+1)) 
+    if (false == DRV_I2C_WriteTransfer(sensorHandle, dev_addr, sensorBuffer, (size_t)len+1)) 
         return BMI160_E_COM_FAIL;
     else
         return BMI160_OK;
