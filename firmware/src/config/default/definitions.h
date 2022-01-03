@@ -67,6 +67,7 @@
 #include "bsp/bsp.h"
 #include "app_display.h"
 #include "app_sensor.h"
+#include "app_control.h"
 
 
 

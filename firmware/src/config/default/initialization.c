@@ -245,6 +245,7 @@ void SYS_Initialize ( void* data )
 
     APP_DISPLAY_Initialize();
     APP_SENSOR_Initialize();
+    APP_CONTROL_Initialize();
 
 
     NVIC_Initialize();

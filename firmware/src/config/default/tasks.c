@@ -79,6 +79,16 @@ void _APP_SENSOR_Tasks(  void *pvParameters  )
         APP_SENSOR_Tasks();
     }
 }
+/* Handle for the APP_CONTROL_Tasks. */
+TaskHandle_t xAPP_CONTROL_Tasks;
+
+void _APP_CONTROL_Tasks(  void *pvParameters  )
+{   
+    while(1)
+    {
+        APP_CONTROL_Tasks();
+    }
+}
 
 
 
@@ -126,6 +136,14 @@ void SYS_Tasks ( void )
                 NULL,
                 1,
                 &xAPP_SENSOR_Tasks);
+
+    /* Create OS Thread for APP_CONTROL_Tasks. */
+    xTaskCreate((TaskFunction_t) _APP_CONTROL_Tasks,
+                "APP_CONTROL_Tasks",
+                128,
+                NULL,
+                1,
+                &xAPP_CONTROL_Tasks);
 
 
 

@@ -8,6 +8,13 @@ files:
   userChecksum: F58DB2348A0FCE945652B285010E5F8A
 - generatedChecksum: null
   logicalPath: ''
+  name: app_control.c
+  physicalPath: ../..
+  security: NON_SECURE
+  type: SOURCE
+  userChecksum: null
+- generatedChecksum: null
+  logicalPath: ''
   name: app_display.c
   physicalPath: ../..
   security: NON_SECURE
@@ -76,13 +83,13 @@ files:
   security: NON_SECURE
   type: SOURCE
   userChecksum: 26AC1C8E4ACE31258A8C6EA7B5FB034C
-- generatedChecksum: 88A2958BD2CB81F4E23F340457D818E6
+- generatedChecksum: 7E9C9101D2DEEBB73427590FE72D8E7A
   logicalPath: config/default
   name: initialization.c
   physicalPath: ''
   security: NON_SECURE
   type: SOURCE
-  userChecksum: 88A2958BD2CB81F4E23F340457D818E6
+  userChecksum: 7E9C9101D2DEEBB73427590FE72D8E7A
 - generatedChecksum: CD5BE59A6E701DE8E4BA300BCB51F706
   logicalPath: config/default
   name: interrupts.c
@@ -216,13 +223,13 @@ files:
   security: NON_SECURE
   type: SOURCE
   userChecksum: 83BDE663A1AAB20C9E52263F22E2ED3C
-- generatedChecksum: 80D4FA3E17009E73E4ED77F7C4C791A2
+- generatedChecksum: CE8F0F2099B10ACE982335EA4BB1676E
   logicalPath: config/default
   name: tasks.c
   physicalPath: ''
   security: NON_SECURE
   type: SOURCE
-  userChecksum: CFE184923EA4170CA7B415C13C040E1D
+  userChecksum: 1CE4F0C9BB99C3D2F03DCBF129AF5E8A
 - generatedChecksum: F1B86F6E1527FD59A8713B67564F2898
   logicalPath: FreeRTOS/Source
   name: timers.c
@@ -244,13 +251,13 @@ files:
   security: NON_SECURE
   type: HEADER
   userChecksum: AF3A8D8AA610E7DFD3E38DDAC5E42074
-- generatedChecksum: 9DB0D33BDC5663675981244DB9E32BF0
+- generatedChecksum: CA3A89D393CED6EF8B419E00BCE4D603
   logicalPath: config/default
   name: FreeRTOSConfig.h
   physicalPath: ''
   security: NON_SECURE
   type: HEADER
-  userChecksum: BC0E71575F5123629F5AA641F473A876
+  userChecksum: 191B0D3E4158D6F59A9D705FDCE8A392
 - generatedChecksum: 9D21A994D081C19F5250140C3745EEC4
   logicalPath: packs/ATSAMD21G17D_DFP/component
   name: ac.h
@@ -279,6 +286,13 @@ files:
   security: NON_SECURE
   type: HEADER
   userChecksum: 096F323CFB65D542FDB59979C8BC3A91
+- generatedChecksum: null
+  logicalPath: ''
+  name: app_control.h
+  physicalPath: ../..
+  security: NON_SECURE
+  type: HEADER
+  userChecksum: null
 - generatedChecksum: null
   logicalPath: ''
   name: app_display.h
@@ -391,13 +405,13 @@ files:
   security: NON_SECURE
   type: HEADER
   userChecksum: B993CD54CFE05568321287F9AE56B7A5
-- generatedChecksum: 6DA547670902C99A7FAEBAF761CDE5E9
+- generatedChecksum: 161CB49B5781BD6BF61926F56A914E03
   logicalPath: config/default
   name: definitions.h
   physicalPath: ''
   security: NON_SECURE
   type: HEADER
-  userChecksum: 6DA547670902C99A7FAEBAF761CDE5E9
+  userChecksum: 161CB49B5781BD6BF61926F56A914E03
 - generatedChecksum: 1EA4EDD5EA90F43EC407DE32441159A9
   logicalPath: FreeRTOS/Source/include
   name: deprecated_definitions.h
