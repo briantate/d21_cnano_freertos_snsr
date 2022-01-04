@@ -21,12 +21,6 @@
     files.
  *******************************************************************************/
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Included Files
-// *****************************************************************************
-// *****************************************************************************
-
 #include "app_sensor.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -36,26 +30,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Global Data Definitions
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    This structure should be initialized by the APP_SENSOR_Initialize function.
-
-    Application strings and buffers are be defined outside this structure.
-*/
 #define SNSR_BUF_SIZE 128
 #define BMI160_DEV_ADDR 0b1101000
 
@@ -65,21 +39,6 @@ QueueHandle_t sensorDataQueue;
 
 sensorData_t sensorDataStruct; 
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/* TODO:  Add any necessary callback functions.
-*/
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Local Functions
-// *****************************************************************************
-// *****************************************************************************
-
 static void init_sensor_interface(void);
 static void init_bmi160(void);
 static void init_bmi160_sensor_driver_interface(void);
@@ -88,23 +47,8 @@ int8_t bmi160_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t l
 int8_t bmi160_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);
 void   bmi160_delay_ms(uint32_t period);
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Initialization and State Machine Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/*******************************************************************************
-  Function:
-    void APP_SENSOR_Initialize ( void )
-
-  Remarks:
-    See prototype in app_sensor.h.
- */
-
 void APP_SENSOR_Initialize ( void )
 {
-    /* Place the App state machine in its initial state. */
     app_sensorData.state = APP_SENSOR_STATE_INIT;
     sensorDataQueue = xQueueCreate( 2, sizeof(sensorData_t));
     printf("sensor task init\r\n");
@@ -112,21 +56,10 @@ void APP_SENSOR_Initialize ( void )
         printf("sensor data queue not created\r\n");
 }
 
-
-/******************************************************************************
-  Function:
-    void APP_SENSOR_Tasks ( void )
-
-  Remarks:
-    See prototype in app_sensor.h.
- */
-
 void APP_SENSOR_Tasks ( void )
 {
-    /* Check the application's current state. */
     switch ( app_sensorData.state )
     {
-        /* Application's initial state. */
         case APP_SENSOR_STATE_INIT:
         {
             init_bmi160_sensor_driver_interface();
@@ -156,13 +89,8 @@ void APP_SENSOR_Tasks ( void )
             break;
         }
 
-        /* TODO: implement your application state machine.*/
-
-
-        /* The default state should never be executed. */
         default:
         {
-            /* TODO: Handle error in application's state machine. */
             break;
         }
     }
@@ -264,8 +192,3 @@ void   bmi160_delay_ms(uint32_t period)
 {
     vTaskDelay(period/portTICK_PERIOD_MS);
 }
-
-
-/*******************************************************************************
- End of File
- */
