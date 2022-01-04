@@ -31,7 +31,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "driver/driver_common.h"
-#include "bmi160.h"
+#include "sensor.h"
 #include "driver/i2c/drv_i2c.h"
 #include <stdio.h>
 #include <stdint.h>
@@ -61,16 +61,9 @@
 
 APP_SENSOR_DATA app_sensorData;
 DRV_HANDLE sensorHandle;
+QueueHandle_t sensorDataQueue;
 
-/*! @brief This structure containing relevant bmi160 info */
-struct bmi160_dev bmi160dev;
-
-/*! @brief variable to hold the bmi160 accel data */
-struct bmi160_sensor_data bmi160_accel;
-
-/*! @brief variable to hold the bmi160 gyro data */
-struct bmi160_sensor_data bmi160_gyro;
-
+sensorData_t sensorDataStruct; 
 
 // *****************************************************************************
 // *****************************************************************************
@@ -113,9 +106,10 @@ void APP_SENSOR_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     app_sensorData.state = APP_SENSOR_STATE_INIT;
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
+    sensorDataQueue = xQueueCreate( 2, sizeof(sensorData_t));
+    printf("sensor task init\r\n");
+    if(NULL == sensorDataQueue)
+        printf("sensor data queue not created\r\n");
 }
 
 
@@ -129,7 +123,6 @@ void APP_SENSOR_Initialize ( void )
 
 void APP_SENSOR_Tasks ( void )
 {
-    static uint32_t measurementCount = 0;
     /* Check the application's current state. */
     switch ( app_sensorData.state )
     {
@@ -146,16 +139,17 @@ void APP_SENSOR_Tasks ( void )
 
         case APP_SENSOR_STATE_SERVICE_TASKS:
         {
-            printf("\033[K");
-            printf("%d\r\n", ++measurementCount);
-            bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &bmi160_accel, &bmi160_gyro, &bmi160dev);
-            printf("\033[K");
-            printf("ax:%d\tay:%d\taz:%d\r\n", bmi160_accel.x, bmi160_accel.y, bmi160_accel.z);
-            printf("\033[K");
-            printf("gx:%d\tgy:%d\tgz:%d\r\n", bmi160_gyro.x, bmi160_gyro.y, bmi160_gyro.z);
-            printf("\033[F");
-            printf("\033[F");
-            printf("\033[F");
+            bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), 
+                    &sensorDataStruct.bmi160_accel, 
+                    &sensorDataStruct.bmi160_gyro, 
+                    &sensorDataStruct.bmi160dev);
+
+            //send data to queue
+            
+            if(NULL != sensorDataQueue)
+            {
+                xQueueSend(sensorDataQueue, &sensorDataStruct, 10);
+            }
             
             vTaskDelay(1000/portTICK_PERIOD_MS); //ToDo: synchronize a different way
 
@@ -185,12 +179,12 @@ static void init_bmi160(void)
 {
     int8_t rslt;
 
-    rslt = bmi160_init(&bmi160dev);
+    rslt = bmi160_init(&sensorDataStruct.bmi160dev);
 
     if (rslt == BMI160_OK)
     {
         printf("BMI160 initialization success !\r\n");
-        printf("Chip ID 0x%X\r\n", bmi160dev.chip_id);
+        printf("Chip ID 0x%X\r\n", sensorDataStruct.bmi160dev.chip_id);
     }
     else
     {
@@ -200,25 +194,25 @@ static void init_bmi160(void)
 
 //    /* Select the Output data rate, range of accelerometer sensor */
 //    bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_1600HZ;
-    bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_100HZ;
+    sensorDataStruct.bmi160dev.accel_cfg.odr = BMI160_ACCEL_ODR_100HZ;
 //    bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_16G;
-    bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
-    bmi160dev.accel_cfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
+    sensorDataStruct.bmi160dev.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
+    sensorDataStruct.bmi160dev.accel_cfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
 //
 //    /* Select the power mode of accelerometer sensor */
-    bmi160dev.accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
+    sensorDataStruct.bmi160dev.accel_cfg.power = BMI160_ACCEL_NORMAL_MODE;
 //
 //    /* Select the Output data rate, range of Gyroscope sensor */
 //    bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_3200HZ;
-    bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_100HZ;
-    bmi160dev.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
-    bmi160dev.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
+    sensorDataStruct.bmi160dev.gyro_cfg.odr = BMI160_GYRO_ODR_100HZ;
+    sensorDataStruct.bmi160dev.gyro_cfg.range = BMI160_GYRO_RANGE_2000_DPS;
+    sensorDataStruct.bmi160dev.gyro_cfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
 //
 //    /* Select the power mode of Gyroscope sensor */
-    bmi160dev.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
+    sensorDataStruct.bmi160dev.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
 
     /* Set the sensor configuration */
-    rslt = bmi160_set_sens_conf(&bmi160dev);
+    rslt = bmi160_set_sens_conf(&sensorDataStruct.bmi160dev);
     if (rslt == BMI160_OK)
     {
         printf("BMI160 set config success !\r\n");
@@ -234,11 +228,11 @@ static void init_bmi160_sensor_driver_interface(void)
 {
     /* link read/write/delay function of host system to appropriate
     * bmi160 function call prototypes */
-    bmi160dev.write = bmi160_write;
-    bmi160dev.read = bmi160_read;
-    bmi160dev.delay_ms = bmi160_delay_ms;
-    bmi160dev.id = BMI160_DEV_ADDR;
-    bmi160dev.intf = BMI160_I2C_INTF;
+    sensorDataStruct.bmi160dev.write = bmi160_write;
+    sensorDataStruct.bmi160dev.read = bmi160_read;
+    sensorDataStruct.bmi160dev.delay_ms = bmi160_delay_ms;
+    sensorDataStruct.bmi160dev.id = BMI160_DEV_ADDR;
+    sensorDataStruct.bmi160dev.intf = BMI160_I2C_INTF;
 }
 
 #define BMI_RX_BUF_SIZE 64

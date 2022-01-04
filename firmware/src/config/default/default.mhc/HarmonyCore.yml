@@ -200,7 +200,7 @@ children:
     - type: Values
       children:
       - type: User
-        attributes: {value: '512'}
+        attributes: {value: '1024'}
   - type: Integer
     attributes: {id: GEN_APP_RTOS_TASK_1_SIZE}
     children:

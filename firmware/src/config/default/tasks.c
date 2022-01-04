@@ -124,7 +124,7 @@ void SYS_Tasks ( void )
         /* Create OS Thread for APP_DISPLAY_Tasks. */
     xTaskCreate((TaskFunction_t) _APP_DISPLAY_Tasks,
                 "APP_DISPLAY_Tasks",
-                128,
+                256,
                 NULL,
                 1,
                 &xAPP_DISPLAY_Tasks);

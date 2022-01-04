@@ -231,6 +231,7 @@
       <itemPath>../src/app_display.h</itemPath>
       <itemPath>../src/app_sensor.h</itemPath>
       <itemPath>../src/app_control.h</itemPath>
+      <itemPath>../src/sensor.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
